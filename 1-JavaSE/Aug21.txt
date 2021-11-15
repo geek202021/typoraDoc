@@ -1,0 +1,58 @@
+//2021/8/21-9:15
+import  io.InputStream;
+import  java.util.Properties;
+import  java.util.ResourceBundle;
+
+
+//1.获取一个文件的绝对路径
+String path = Thread.currentThread().getContextClassLoader().getResource("reflect.properties").getPath();
+FileReader fr = new FileReader(path);
+
+//2.直接以流的形式返回
+InputStream ins = Thread.currentThread().getContextClassLoader().getResourceAsStream("reflect.properties");
+Properties pro = new Properties();
+pro.load(ins);
+ins.close();
+//通过key获取value
+String classname = pro.getProperty("className");
+System.out.println(classname);
+
+//3.资源绑定器的方式
+ResourceBundle  bundle = ResourceBundle.getBundle("reflect");
+String classname2 = bundle.getString("className");
+System.out.println(classname2);
+
+//2021/8/21-9:25
+//通过反射机制访问对象的属性field
+class Student{
+    public int number;
+    private String name;
+    protected int  age;
+    boolean sex;
+    public static final double MATH_PI = 3.1415926;
+}
+public class ReflectField{
+     public static void main(String[] args){
+     	//1.获取Class
+	Class clazz = Class.forName("com.bean.Student");
+	//2.通过newInstance方法拿到obj对象
+	Object obj = clazz.newInstance();
+	//3.获取number属性
+	Field numberField = clazz.getDeclaredField("number");
+	//4.给obj对象（Student对象）的number属性赋值
+	numberField.set(obj, 222);
+	//5.读取属性的值
+	Object o = numberField.get(obj);
+	System.out.println(o);
+	
+	//访问私有属性
+	Field privateField = clazz.getDeclaredField("name");
+	//打破封装
+	privateField.setAccessible(true);
+	//给name属性赋值
+	privateField.set(obj, "Tom");
+	//获取name属性的值
+	System.out.println(privateField.get(obj));
+	
+     }
+}
